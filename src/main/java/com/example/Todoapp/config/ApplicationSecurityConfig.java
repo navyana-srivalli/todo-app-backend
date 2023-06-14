@@ -1,8 +1,11 @@
 package com.example.Todoapp.config;
 
 import com.example.Todoapp.filter.JwtTokenFilter;
+import com.example.Todoapp.filter.LoginFilter;
 import com.example.Todoapp.repository.UserRepository;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import com.example.Todoapp.security.JwtTokenUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -23,30 +26,27 @@ import java.util.Arrays;
 import java.util.List;
 
 @EnableWebSecurity
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenFilter jwtTokenFilter;
 
-//    private final LoginFilter loginFilter;
     private final UserRepository userRepository;
 
-    public ApplicationSecurityConfig(UserRepository userRepository, JwtTokenFilter jwtTokenFilter) {
-        this.userRepository = userRepository;
-        this.jwtTokenFilter = jwtTokenFilter;
-//        this.loginFilter = loginFilter;
-    }
+
+    private final JwtTokenUtil jwtUtil;
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-//    @Bean
-//    public FilterRegistrationBean<LoginFilter> loginFilterRegistration() {
-//        FilterRegistrationBean<LoginFilter> registration = new FilterRegistrationBean<>();
-//        registration.setFilter(new LoginFilter());
-//        registration.addUrlPatterns("/api/login"); // Apply the filter only to the login endpoint
-//        return registration;
-//    }
+    @Bean
+    public LoginFilter loginFilter() throws Exception {
+        LoginFilter loginFilter1 = new LoginFilter(authenticationManagerBean(), jwtUtil);
+        loginFilter1.setAuthenticationManager(super.authenticationManagerBean());
+        return loginFilter1;
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -60,6 +60,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
@@ -86,7 +87,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 });
         http.headers()
                 .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN);
-//        http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }

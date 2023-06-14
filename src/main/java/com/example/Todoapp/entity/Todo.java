@@ -8,14 +8,12 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "todos")
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
 public class Todo {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(nullable = false, length = 128)
+
     private String title;
 
     @JsonIgnore

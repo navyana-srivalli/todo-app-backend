@@ -19,13 +19,13 @@ public class User implements UserDetails {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, length = 50, unique = true)
+    @Column
     private String username;
 
-    @Column(nullable = false, length = 64)
+    @Column
     private String password;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Todo> todos;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

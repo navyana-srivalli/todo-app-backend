@@ -16,16 +16,22 @@ public class UserService {
     public void saveUser(User user) {
         userRepository.save(user);
     }
-    public void deleteUser(User user) {
-        userRepository.deleteById(user.getId());
-    }
+//    public void deleteUser(User user) {
+//        userRepository.deleteById(user.getId());
+//    }
 
-    public User find(String username) throws Exception {
+//    public User find(String username) throws Exception {
+//        Optional<User> optionalUser = Optional.ofNullable(userRepository.getUserByUsername(username));
+//        if (optionalUser.isPresent()) {
+//            throw new Exception("User already exists");
+//        }
+//        return null;
+//    }
+
+    public void checkIfUserExist(String username) throws Exception{
         Optional<User> optionalUser = Optional.ofNullable(userRepository.getUserByUsername(username));
         if (optionalUser.isPresent()) {
             throw new Exception("User already exists");
         }
-        return null;
     }
-
 }

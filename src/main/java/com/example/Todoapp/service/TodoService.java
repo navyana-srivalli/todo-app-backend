@@ -26,39 +26,31 @@ public class TodoService{
         this.userRepository = userRepository;
     }
 
-    @Transactional
-    public void delete(int id) {
-             todoRepository.deleteTodoById(id);
+
+    public void delete(Long id) {
+        todoRepository.deleteTodoById(id);
     }
-    public Todo getTodoById(int id) {
-        return todoRepository.getTodoById(id);
-    }
-    public List<Todo> getTodosByUser(String username) {
+
+    public List<Todo> getTodos() {
+        String username = CurrentUserContext.getCurrentUser();
         User user = userRepository.getUserByUsername(username);
         return user.getTodos();
     }
 
-    public void update(int id,Todo updatedTodo, Authentication auth) throws Exception {
-            Todo todo = getTodoById(id);
-            if (todo == null) {
-                return;
-            }
-            todo.setTitle(updatedTodo.getTitle());
-            save(todo, auth);
+    public void update(Todo updatedTodo) throws Exception {
+            save(updatedTodo);
     }
 
 
-    public void save(Todo todo, Authentication auth) throws Exception {
-        Optional<User> userOptional = Optional.ofNullable(userRepository.getUserByUsername(auth.getName()));
+    public void save(Todo todo) throws Exception {
+        String user = CurrentUserContext.getCurrentUser();
+        Optional<User> userOptional = Optional.ofNullable(userRepository.getUserByUsername(user));
         if(((Optional<?>) userOptional).isEmpty()) {
             throw new Exception("User Not found");
         }
         User userData = userOptional.get();
         todo.setUser(userData);
         todoRepository.save(todo);
-    }
-    public List<Todo> getTodosByUser(User user) {
-        return todoRepository.getTodoByUser(user);
     }
 
 }

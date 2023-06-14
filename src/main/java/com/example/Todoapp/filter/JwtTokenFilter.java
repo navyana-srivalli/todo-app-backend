@@ -2,6 +2,7 @@ package com.example.Todoapp.filter;
 
 import com.example.Todoapp.entity.User;
 import com.example.Todoapp.security.JwtTokenUtil;
+import com.example.Todoapp.service.CurrentUserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,6 +20,7 @@ import java.io.IOException;
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtTokenUtil jwtUtil;
+
 
     public JwtTokenFilter(JwtTokenUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
@@ -69,7 +70,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         userDetails.setId(Integer.parseInt(jwtSubject[0]));
         userDetails.setUsername(jwtSubject[1]);
-
+        CurrentUserContext.setCurrentUser(jwtSubject[1]);
         return userDetails;
     }
 }
